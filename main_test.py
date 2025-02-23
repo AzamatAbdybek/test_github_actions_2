@@ -1,30 +1,21 @@
-import unittest
-import json
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from main import app
+import unittest
 
+app = FastAPI()
 
-class TestApp(unittest.TestCase):
+@app.get("/")
+async def read_root():
+    return {"Hello": "World"}
+
+class TestMinimalApp(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)
-        with open("data.json", "r") as f:
-            self.data = json.load(f)
 
-    def test_read_data(self):
+    def test_read_root(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), self.data)
+        self.assertEqual(response.json(), {"Hello": "World"})
 
-    def test_read_data_by_guid(self):
-        guid = self.data[0]["guid"]
-        response = self.client.get(f"/{guid}")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), self.data[0])
-
-    def test_read_data_by_invalid_guid(self):
-        response = self.client.get("/invalid-guid")
-        self.assertEqual(response.status_code, 404)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

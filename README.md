@@ -1,1 +1,1 @@
-GH tests 2
+GH test 2

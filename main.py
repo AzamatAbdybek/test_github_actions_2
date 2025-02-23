@@ -1,21 +1,21 @@
-from fastapi import FastAPI, HTTPException
-import json
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+import unittest
 
 app = FastAPI()
 
-# Load data from file
-with open("data.json", "r") as f:
-    data = json.load(f)
-
-
 @app.get("/")
-async def read_data():
-    return data
+async def read_root():
+    return {"Hello": "World"}
 
+class TestMinimalApp(unittest.TestCase):
+    def setUp(self):
+        self.client = TestClient(app)
 
-@app.get("/{guid}")
-async def read_data_by_guid(guid: str):
-    for item in data:
-        if item["guid"] == guid:
-            return item
-    raise HTTPException(status_code=404, detail="Item not found")
+    def test_read_root(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"Hello": "World"})
+
+if __name__ == '__main__':
+    unittest.main()
